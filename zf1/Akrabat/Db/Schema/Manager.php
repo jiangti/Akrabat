@@ -10,7 +10,7 @@ class Akrabat_Db_Schema_Manager
     /**
      * @var string
      */
-    protected $_schemaVersionTableName = 'schema_version';
+    protected $_schemaVersionTableName = 'schemaVersion';
     
     /**
      * Directory containing migration files
@@ -72,16 +72,28 @@ class Akrabat_Db_Schema_Manager
             // exception means that the schema version table doesn't exist, so create it
             $createSql = "CREATE TABLE $schemaVersionTableName ( 
                 version bigint NOT NULL,
+                dateAdded timestamp default CURRENT_TIMESTAMP,
+                description varchar(255), 
                 PRIMARY KEY (version)
             )";
             $this->_db->query($createSql);
-            $insertSql = "INSERT INTO $schemaVersionTableName (version) VALUES (0)";
+            $insertSql = "INSERT INTO $schemaVersionTableName (version, description) VALUES (0, 'Initialization.')";
             $this->_db->query($insertSql);
             $version = $this->_db->fetchOne($sql);
         }
         
         return $version;
     } 
+    
+    public function getCurrentSchema() {
+    	$this->getCurrentSchemaVersion();
+    	$schemaVersionTableName = $this->getPrefixedSchemaVersionTableName();
+    	
+    	$sql = "SELECT * FROM " . $schemaVersionTableName;
+    	
+    	return $this->_db->fetchRow($sql);
+    	
+    }
     
     /**
      * Updates the database schema to a specified version. If upgrading (increasing
