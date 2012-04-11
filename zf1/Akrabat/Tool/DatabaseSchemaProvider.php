@@ -173,6 +173,32 @@ class Akrabat_Tool_DatabaseSchemaProvider extends Zend_Tool_Project_Provider_Abs
             return false;
         }
     }
+    
+    public function createMigration($text, $dir='./migrations') {
+    	$timestamp = time();
+    	$safeDecription = preg_replace('/[^A-Za-z0-9_]+/', '_', strtolower($text));
+    	$file = APPLICATION_ROOT . '/' . $dir . '/' . $timestamp . '-' . $timestamp . '-' . $safeDecription . '.php';
+    	$template = '<?php
+/**
+ * %s 
+ */
+class DbSchema_%s extends Akrabat_Db_Schema_AbstractChange 
+{
+    public function up()
+    {
+        $sql = "";
+        $this->_db->query($sql);
+    }
+    
+    public function down()
+    {
+        $this->_db->query($sql);
+    }
+}';
+    	$content = sprintf($template, $text, $timestamp);
+    	file_put_contents($file, $content);
+    	echo "nano " . $file . PHP_EOL;
+    }
 
     /**
      * Retrieves the realpath for ./migrations. Does not appear to be 

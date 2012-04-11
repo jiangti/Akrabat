@@ -255,14 +255,14 @@ class Akrabat_Db_Schema_Manager
         
         $d = dir($this->_dir);
         while (false !== ($entry = $d->read())) {
-            if (preg_match('/^([0-9]+)\-(.*)\.php/i', $entry, $matches) ) {
-                $versionNumber = (int)$matches[1];
+            if (preg_match('/^([0-9]+)\-(.*)-(.*)\.php/i', $entry, $matches) ) {
+                $versionNumber = (int) $matches[1];
                 $className = $matches[2];
                 if ($versionNumber > $from && $versionNumber <= $to) {
                     $files[$versionNumber] = array(
                         'filename'=>$entry,
                         'version'=>$versionNumber,
-                        'classname'=>$className);
+                        'classname'=> 'DbSchema_' . $className);
                 }
             }
         }
@@ -273,7 +273,6 @@ class Akrabat_Db_Schema_Manager
         } else {
             krsort($files);
         }
-        
         return $files;
     } 
     
@@ -315,7 +314,14 @@ class Akrabat_Db_Schema_Manager
             throw new Akrabat_Db_Schema_Exception("Could not find class '$classname' in file '$filename'");
         }
         $class = new $classname($this->_db, $this->_tablePrefix);
-        $class->$direction();
+        try {
+	        $this->_db->beginTransaction();
+	        $class->$direction();
+	        $this->_db->commit();
+        } catch (Exception $e) {
+	        $this->_db->rollBack();
+	        throw new $e;     	
+        }
         
         if($direction == 'down') {
             // current version is actually one lower than this version now
