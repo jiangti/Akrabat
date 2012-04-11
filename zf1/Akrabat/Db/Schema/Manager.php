@@ -337,10 +337,10 @@ class Akrabat_Db_Schema_Manager
      * 
      * @return null
      */
-    protected function _updateSchemaVersion($version) 
+    protected function _updateSchemaVersion($version, $filename) 
     {
         $schemaVersionTableName = $this->getPrefixedSchemaVersionTableName();
-        $sql = "UPDATE  $schemaVersionTableName SET version = " . (int)$version;
+        $sql = sprintf("UPDATE %s SET version = %d, description = '%s'" ,  $schemaVersionTableName ,$version, $filename);
         $this->_db->query($sql);
     }
     
