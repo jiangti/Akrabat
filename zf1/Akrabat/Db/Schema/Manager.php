@@ -320,7 +320,7 @@ class Akrabat_Db_Schema_Manager
 	        $this->_db->commit();
         } catch (Exception $e) {
 	        $this->_db->rollBack();
-	        throw new $e;     	
+	        throw new Akrabat_Db_Schema_Exception($e->getMessage());
         }
         
         if($direction == 'down') {
@@ -340,7 +340,7 @@ class Akrabat_Db_Schema_Manager
     protected function _updateSchemaVersion($version, $filename) 
     {
         $schemaVersionTableName = $this->getPrefixedSchemaVersionTableName();
-        $sql = sprintf("UPDATE %s SET dateAdded = " . time() . ", version = %d, description = '%s'" ,  $schemaVersionTableName ,$version, $filename);
+        $sql = sprintf("UPDATE %s SET dateAdded = '" . date("Y-m-d H:i:s") . "', version = %d, description = '%s'" ,  $schemaVersionTableName ,$version, $filename);
         $this->_db->query($sql);
     }
     
