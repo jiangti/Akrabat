@@ -327,7 +327,7 @@ class Akrabat_Db_Schema_Manager
             // current version is actually one lower than this version now
             $version--;
         }
-        $this->_updateSchemaVersion($version);
+        $this->_updateSchemaVersion($version, $filename);
     } 
     
     /**
@@ -340,7 +340,7 @@ class Akrabat_Db_Schema_Manager
     protected function _updateSchemaVersion($version, $filename) 
     {
         $schemaVersionTableName = $this->getPrefixedSchemaVersionTableName();
-        $sql = sprintf("UPDATE %s SET version = %d, description = '%s'" ,  $schemaVersionTableName ,$version, $filename);
+        $sql = sprintf("UPDATE %s SET dateAdded = " . time() . ", version = %d, description = '%s'" ,  $schemaVersionTableName ,$version, $filename);
         $this->_db->query($sql);
     }
     
